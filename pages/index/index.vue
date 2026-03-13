@@ -154,9 +154,8 @@
 	}
 
 	function openGoods(goods) {
-		uni.showToast({
-			title: goods.title,
-			icon: 'none'
+		uni.navigateTo({
+			url: `/pages/goods-detail/goods-detail?id=${goods.id}`
 		})
 	}
 

@@ -146,7 +146,7 @@
 
 <style scoped>
 	.page {
-		min-height: 100vh;
+		height: calc(100vh - var(--window-bottom) - var(--window-top));
 		background-color: #f5f5f5;
 		padding-bottom: 40rpx;
 	}

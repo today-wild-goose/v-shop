@@ -171,25 +171,10 @@
 
 <style scoped>
 	.page {
-		height: 100vh;
+		height: calc(100vh - var(--window-bottom) - var(--window-top));
 		background-color: #f5f5f5;
 	}
 
-	.search-fixed {
-		position: fixed;
-		left: 0;
-		right: 0;
-		top: 0;
-		z-index: 1000;
-		padding: 24rpx;
-		background-color: #f5f5f5;
-	}
-
-	.search-inner {
-		background-color: #ffffff;
-		border-radius: 24rpx;
-		overflow: hidden;
-	}
 
 	.content {
 		height: 100%;
@@ -202,6 +187,7 @@
 		overflow: hidden;
 		background-color: #ffffff;
 		border-radius: 24rpx;
+		margin-top: 24rpx;
 	}
 
 	.swiper {

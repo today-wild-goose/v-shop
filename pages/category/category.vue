@@ -248,16 +248,15 @@
 	}
 
 	function openGoods(goods) {
-		uni.showToast({
-			title: goods.title,
-			icon: 'none'
+		uni.navigateTo({
+			url: `/pages/goods-detail/goods-detail?id=${goods.id}`
 		})
 	}
 </script>
 
 <style scoped>
 	.page {
-		height: 100vh;
+		height: calc(100vh - var(--window-bottom) - var(--window-top));
 		background-color: #f5f5f5;
 	}
 
