@@ -1,71 +1,106 @@
 <template>
 	<view class="page">
-		<view class="header">
-			<view class="user" @click="openProfile">
-				<image class="avatar" :src="user.avatar" mode="aspectFill" />
-				<view class="user-info">
-					<text class="nickname">{{ isLogin ? user.nickname : '未登录' }}</text>
-					<text class="desc">{{ isLogin ? `ID: ${user.id}` : '点击登录 / 注册' }}</text>
-				</view>
-				<view class="user-arrow">
-					<uni-icons type="right" size="18" color="#ffffff"></uni-icons>
-				</view>
-			</view>
+		<view v-if="!isLogin" class="blocked"></view>
 
-			<view class="header-actions">
-				<button v-if="!isLogin" class="header-btn" type="primary" @click.stop="login">登录</button>
-				<button v-else class="header-btn header-btn--ghost" @click.stop="logout">退出登录</button>
-			</view>
-		</view>
-
-		<view class="card">
-			<view class="card-title">
-				<text class="card-title-text">我的订单</text>
-				<view class="card-title-more" @click="openOrders('all')">
-					<text class="more-text">全部订单</text>
-					<uni-icons type="right" size="16" color="#999999"></uni-icons>
-				</view>
-			</view>
-
-			<uni-grid :column="5" :highlight="false" :show-border="false" :square="false">
-				<uni-grid-item v-for="item in orderEntries" :key="item.id" @click.native="openOrders(item.id)">
-					<view class="order-entry">
-						<view class="order-icon">
-							<text class="order-icon-text">{{ item.short }}</text>
-							<uni-badge v-if="item.badge > 0" class="order-badge" :text="item.badge" type="error" size="small" />
-						</view>
-						<text class="order-text">{{ item.text }}</text>
+		<template v-else>
+			<view class="header">
+				<view class="user" @click="openProfile">
+					<image class="avatar" :src="user.avatar" mode="aspectFill" />
+					<view class="user-info">
+						<text class="nickname">{{ user.nickname }}</text>
+						<text class="desc">ID: {{ user.id }}</text>
 					</view>
-				</uni-grid-item>
-			</uni-grid>
-		</view>
+					<view class="user-arrow">
+						<uni-icons type="right" size="18" color="#ffffff"></uni-icons>
+					</view>
+				</view>
 
-		<view class="card">
-			<view class="card-title">
-				<text class="card-title-text">常用功能</text>
 			</view>
-			<uni-list :border="false">
-				<uni-list-item title="收货地址" showArrow clickable @click="openFeature('收货地址')"></uni-list-item>
-				<uni-list-item title="优惠券" showArrow clickable @click="openFeature('优惠券')"></uni-list-item>
-				<uni-list-item title="联系客服" showArrow clickable @click="openFeature('联系客服')"></uni-list-item>
-				<uni-list-item title="设置" showArrow clickable @click="openFeature('设置')"></uni-list-item>
-			</uni-list>
-		</view>
 
-		<view class="footer">
-			<text class="footer-text">v-shop · 1.0.0</text>
-		</view>
+			<view class="card">
+				<view class="card-title">
+					<text class="card-title-text">我的订单</text>
+					<view class="card-title-more" @click="openOrders('all')">
+						<text class="more-text">全部订单</text>
+						<uni-icons type="right" size="16" color="#999999"></uni-icons>
+					</view>
+				</view>
+
+				<uni-grid :column="5" :highlight="false" :show-border="false" :square="false">
+					<uni-grid-item v-for="item in orderEntries" :key="item.id" @click.native="openOrders(item.id)">
+						<view class="order-entry">
+							<view class="order-icon">
+								<text class="order-icon-text">{{ item.short }}</text>
+								<uni-badge v-if="item.badge > 0" class="order-badge" :text="item.badge" type="error" size="small" />
+							</view>
+							<text class="order-text">{{ item.text }}</text>
+						</view>
+					</uni-grid-item>
+				</uni-grid>
+			</view>
+
+			<view class="card">
+				<view class="card-title">
+					<text class="card-title-text">常用功能</text>
+				</view>
+				<uni-list :border="false">
+					<uni-list-item title="收货地址" showArrow clickable @click="openFeature('收货地址')"></uni-list-item>
+					<uni-list-item title="联系客服" showArrow clickable @click="openFeature('联系客服')"></uni-list-item>
+					<uni-list-item title="设置" showArrow clickable @click="openFeature('设置')"></uni-list-item>
+					<uni-list-item title="退出登录" clickable @click="logout"></uni-list-item>
+				</uni-list>
+			</view>
+
+			<view class="footer">
+				<text class="footer-text">v-shop · 1.0.0</text>
+			</view>
+		</template>
 	</view>
 </template>
 
 <script setup>
 	import { ref } from 'vue'
+	import { onShow } from '@dcloudio/uni-app'
+
+	const TOKEN_KEY = 'vshop_token'
+	const USER_KEY = 'vshop_user'
 
 	const isLogin = ref(false)
 	const user = ref({
 		avatar: '/static/logo.png',
 		nickname: 'v-shop 用户',
 		id: '10001'
+	})
+
+	const isRedirecting = ref(false)
+
+	onShow(() => {
+		isLogin.value = Boolean(uni.getStorageSync(TOKEN_KEY))
+		if (!isLogin.value && !isRedirecting.value) {
+			isRedirecting.value = true
+			uni.navigateTo({
+				url: '/pages/login/login?redirect=/pages/mine/mine&redirectType=switchTab'
+			})
+			setTimeout(() => {
+				isRedirecting.value = false
+			}, 350)
+			return
+		}
+
+		if (isLogin.value) {
+			try {
+				const raw = uni.getStorageSync(USER_KEY)
+				const parsed = raw ? JSON.parse(raw) : null
+				if (parsed && typeof parsed === 'object') {
+					user.value = {
+						avatar: parsed.avatar || '/static/logo.png',
+						nickname: parsed.nickname || 'v-shop 用户',
+						id: parsed.id || '10001'
+					}
+				}
+			} catch (e) {
+			}
+		}
 	})
 
 	const orderEntries = ref([{
@@ -95,21 +130,18 @@
 		badge: 0
 	}])
 
-	function login() {
-		isLogin.value = true
-		uni.showToast({
-			title: '已登录（示例）',
-			icon: 'none'
-		})
-	}
-
 	function logout() {
 		uni.showModal({
 			title: '提示',
 			content: '确定退出登录吗？',
 			success(res) {
 				if (res.confirm) {
+					uni.removeStorageSync(TOKEN_KEY)
+					uni.removeStorageSync(USER_KEY)
 					isLogin.value = false
+					uni.navigateTo({
+						url: '/pages/login/login?redirect=/pages/mine/mine&redirectType=switchTab'
+					})
 				}
 			}
 		})
@@ -117,19 +149,12 @@
 
 	function openProfile() {
 		uni.showToast({
-			title: isLogin.value ? '个人资料（待实现）' : '请先登录',
+			title: '个人资料（待实现）',
 			icon: 'none'
 		})
 	}
 
 	function openOrders(type) {
-		if (!isLogin.value) {
-			uni.showToast({
-				title: '请先登录',
-				icon: 'none'
-			})
-			return
-		}
 		uni.showToast({
 			title: `订单：${type}`,
 			icon: 'none'
@@ -149,6 +174,10 @@
 		height: calc(100vh - var(--window-bottom) - var(--window-top));
 		background-color: #f5f5f5;
 		padding-bottom: 40rpx;
+	}
+
+	.blocked {
+		height: 100%;
 	}
 
 	.header {

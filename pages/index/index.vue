@@ -3,7 +3,7 @@
 		<view class="search-fixed">
 			<view class="search-inner">
 				<uni-search-bar v-model="keyword" placeholder="搜索商品" cancelButton="none" clearButton="auto" radius="100"
-					@confirm="onSearchConfirm" @clear="onSearchClear" />
+					@focus="onSearchFocus" @confirm="onSearchConfirm" @clear="onSearchClear" />
 			</view>
 		</view>
 		<view class="div-line"></view>
@@ -170,6 +170,12 @@
 
 	function onSearchClear() {
 		keyword.value = ''
+	}
+
+	function onSearchFocus() {
+		uni.navigateTo({
+			url: '/pages/search/search'
+		})
 	}
 
 	const showBackTop = ref(false)

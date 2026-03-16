@@ -1,79 +1,101 @@
 <template>
 	<view class="page">
-		<view v-if="cartItems.length === 0" class="empty">
-			<uni-icons type="cart" size="64" color="#c7c7c7"></uni-icons>
-			<text class="empty-text">购物车还是空的</text>
-			<button class="empty-btn" type="primary" @click="goHome">去逛逛</button>
-		</view>
+		<view v-if="!isLogin" class="blocked"></view>
 
-		<view v-else class="layout">
-			<scroll-view class="list" scroll-y :show-scrollbar="false">
-				<view class="group">
-					<view class="group-title">
-						<uni-icons type="shop" size="18" color="#333333"></uni-icons>
-						<text class="group-title-text">v-shop 自营</text>
-					</view>
+		<template v-else>
+			<view v-if="cartItems.length === 0" class="empty">
+				<uni-icons type="cart" size="64" color="#c7c7c7"></uni-icons>
+				<text class="empty-text">购物车还是空的</text>
+				<button class="empty-btn" type="primary" @click="goHome">去逛逛</button>
+			</view>
 
-					<view v-for="item in cartItems" :key="item.id" class="item">
-						<view class="check" @click="toggleItem(item.id)">
-							<view :class="['checkbox', item.checked ? 'checkbox--checked' : '']">
-								<uni-icons v-if="item.checked" type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
-							</view>
+			<view v-else class="layout">
+				<scroll-view class="list" scroll-y :show-scrollbar="false">
+					<view class="group">
+						<view class="group-title">
+							<uni-icons type="shop" size="18" color="#333333"></uni-icons>
+							<text class="group-title-text">v-shop 自营</text>
 						</view>
 
-						<image class="item-img" :src="item.image" mode="aspectFill" />
-
-						<view class="item-body">
-							<text class="item-title">{{ item.title }}</text>
-							<text class="item-sku">{{ item.sku }}</text>
-
-							<view class="item-footer">
-								<text class="item-price">¥{{ item.price }}</text>
-								<view class="stepper">
-									<view class="stepper-btn" :class="item.quantity <= 1 ? 'stepper-btn--disabled' : ''"
-										@click="decrease(item.id)">-</view>
-									<text class="stepper-num">{{ item.quantity }}</text>
-									<view class="stepper-btn" @click="increase(item.id)">+</view>
+						<view v-for="item in cartItems" :key="item.id" class="item">
+							<view class="check" @click="toggleItem(item.id)">
+								<view :class="['checkbox', item.checked ? 'checkbox--checked' : '']">
+									<uni-icons v-if="item.checked" type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
 								</view>
 							</view>
+
+							<image class="item-img" :src="item.image" mode="aspectFill" />
+
+							<view class="item-body">
+								<text class="item-title">{{ item.title }}</text>
+								<text class="item-sku">{{ item.sku }}</text>
+
+								<view class="item-footer">
+									<text class="item-price">¥{{ item.price }}</text>
+									<view class="stepper">
+										<view class="stepper-btn" :class="item.quantity <= 1 ? 'stepper-btn--disabled' : ''"
+											@click="decrease(item.id)">-</view>
+										<text class="stepper-num">{{ item.quantity }}</text>
+										<view class="stepper-btn" @click="increase(item.id)">+</view>
+									</view>
+								</view>
+							</view>
+
+							<view class="remove" @click="removeItem(item.id)">
+								<uni-icons type="trash" size="18" color="#999999"></uni-icons>
+							</view>
 						</view>
+					</view>
 
-						<view class="remove" @click="removeItem(item.id)">
-							<uni-icons type="trash" size="18" color="#999999"></uni-icons>
+					<view class="safe-area"></view>
+				</scroll-view>
+
+				<view class="bar">
+					<view class="bar-left" @click="toggleAll">
+						<view :class="['checkbox', allChecked ? 'checkbox--checked' : '']">
+							<uni-icons v-if="allChecked" type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
 						</view>
+						<text class="bar-text">全选</text>
 					</view>
-				</view>
 
-				<view class="safe-area"></view>
-			</scroll-view>
-
-			<view class="bar">
-				<view class="bar-left" @click="toggleAll">
-					<view :class="['checkbox', allChecked ? 'checkbox--checked' : '']">
-						<uni-icons v-if="allChecked" type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
+					<view class="bar-right">
+						<view class="bar-total">
+							<text class="bar-total-label">合计：</text>
+							<text class="bar-total-value">¥{{ totalPrice }}</text>
+						</view>
+						<button class="bar-btn" type="primary" :disabled="checkedCount === 0" @click="checkout">
+							去结算({{ checkedCount }})
+						</button>
 					</view>
-					<text class="bar-text">全选</text>
-				</view>
-
-				<view class="bar-right">
-					<view class="bar-total">
-						<text class="bar-total-label">合计：</text>
-						<text class="bar-total-value">¥{{ totalPrice }}</text>
-					</view>
-					<button class="bar-btn" type="primary" :disabled="checkedCount === 0" @click="checkout">
-						去结算({{ checkedCount }})
-					</button>
 				</view>
 			</view>
-		</view>
+		</template>
 	</view>
 </template>
 
 <script setup>
 	import { computed, ref } from 'vue'
+	import { onShow } from '@dcloudio/uni-app'
+
+	const TOKEN_KEY = 'vshop_token'
+	const isLogin = ref(false)
+	const isRedirecting = ref(false)
+
+	onShow(() => {
+		isLogin.value = Boolean(uni.getStorageSync(TOKEN_KEY))
+		if (!isLogin.value && !isRedirecting.value) {
+			isRedirecting.value = true
+			uni.navigateTo({
+				url: '/pages/login/login?redirect=/pages/cart/cart&redirectType=switchTab'
+			})
+			setTimeout(() => {
+				isRedirecting.value = false
+			}, 350)
+		}
+	})
 
 	const cartItems = ref([{
-		id: 'c1',
+		id: 'g1',
 		title: '旗舰手机 12GB+256GB',
 		sku: '黑色 / 256GB',
 		price: 3999,
@@ -81,7 +103,7 @@
 		quantity: 1,
 		checked: true
 	}, {
-		id: 'c2',
+		id: 'g5',
 		title: '真无线降噪耳机',
 		sku: '白色 / 标准版',
 		price: 499,
@@ -89,7 +111,7 @@
 		quantity: 2,
 		checked: true
 	}, {
-		id: 'c3',
+		id: 'g3',
 		title: '智能空气炸锅 5L 大容量',
 		sku: '5L / 黑色',
 		price: 299,
@@ -165,6 +187,10 @@
 	.page {
 		height: calc(100vh - var(--window-bottom) - var(--window-top));
 		background-color: #f5f5f5;
+	}
+
+	.blocked {
+		height: 100%;
 	}
 
 	.layout {

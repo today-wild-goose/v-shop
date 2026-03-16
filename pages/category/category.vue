@@ -166,47 +166,47 @@
 
 	const goodsList = ref([{
 		id: 'g1',
-		categoryId: 'c-phone',
+		categoryId: 'phone',
 		title: '旗舰手机 12GB+256GB',
 		price: '3999.00',
 		image: '/static/c4.png',
 		tag: '新品'
 	}, {
 		id: 'g2',
-		categoryId: 'c-phone',
-		title: '真无线降噪耳机',
-		price: '499.00',
-		image: '/static/c8.png',
-		tag: ''
-	}, {
-		id: 'g3',
-		categoryId: 'c-computer',
+		categoryId: 'computer',
 		title: '轻薄笔记本 i7/16G/1T',
 		price: '6299.00',
 		image: '/static/c5.png',
 		tag: '热卖'
 	}, {
-		id: 'g4',
-		categoryId: 'c-computer',
-		title: '机械键盘 RGB 104 键',
-		price: '199.00',
-		image: '/static/c9.png',
-		tag: ''
-	}, {
-		id: 'g5',
-		categoryId: 'c-appliance',
+		id: 'g3',
+		categoryId: 'appliance',
 		title: '智能空气炸锅 5L 大容量',
 		price: '299.00',
 		image: '/static/c6.png',
 		tag: '优惠'
 	}, {
-		id: 'g6',
-		categoryId: 'c-food',
+		id: 'g4',
+		categoryId: 'snack',
 		title: '坚果礼盒 混合口味 30 包',
 		price: '89.00',
 		image: '/static/c7.png',
 		tag: ''
 	}, {
+		id: 'g5',
+		categoryId: 'phone',
+		title: '真无线降噪耳机',
+		price: '499.00',
+		image: '/static/c8.png',
+		tag: ''
+	}, {
+		id: 'g6',
+		categoryId: 'computer',
+		title: '机械键盘 RGB 104 键',
+		price: '199.00',
+		image: '/static/c9.png',
+		tag: ''
+	},{
 		id: 'g7',
 		categoryId: 'c-clothes',
 		title: '经典白色短袖 T 恤',

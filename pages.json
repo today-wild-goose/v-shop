@@ -31,6 +31,20 @@
 			"navigationBarBackgroundColor": "#ffffff",
 			"navigationBarTextStyle": "black"
 		}
+	}, {
+		"path": "pages/search/search",
+		"style": {
+			"navigationBarTitleText": "搜索",
+			"navigationBarBackgroundColor": "#ffffff",
+			"navigationBarTextStyle": "black"
+		}
+	}, {
+		"path": "pages/login/login",
+		"style": {
+			"navigationBarTitleText": "登录",
+			"navigationBarBackgroundColor": "#ffffff",
+			"navigationBarTextStyle": "black"
+		}
 	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
