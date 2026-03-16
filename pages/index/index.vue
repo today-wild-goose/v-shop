@@ -54,7 +54,7 @@
 <script setup>
 	import { computed, ref } from 'vue'
 	import { onPageScroll } from '@dcloudio/uni-app'
-
+	const data = ref(null)
 	const keyword = ref('')
 	const bannerCurrent = ref(0)
 	const banners = ref([{
@@ -184,6 +184,13 @@
 			duration: 300
 		})
 	}
+	uni.request({
+		url:"http://127.0.0.1:4523/m1/6364752-6060938-default/api",
+		success:(res)=>{
+			data.value =  res.data
+		}
+	})
+	console.log(data.value);
 </script>
 
 <style scoped>
